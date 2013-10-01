@@ -24,4 +24,5 @@ public:
 		return _name;
 	}
 };
+
 #endif

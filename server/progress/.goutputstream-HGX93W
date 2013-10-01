@@ -1,0 +1,135 @@
+#include "../util/sysDefine.h"
+#include "prgNode.h"
+#include <cstdlib>
+#include <dirent.h>
+#include <ctype.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <fcntl.h>
+#include <cstring>
+#include <vector>
+#include <cstdio>
+#include <iostream>
+using namespace std;
+
+#define PROC_PATH			"/proc"
+#define MAX_LENGTH			256
+#define PRG_SOCKET_PFX		"socket:["
+
+struct node* prgNode[PRG_HASH_SIZE];
+
+bool isPidDir (char* fullPath) {
+	struct stat statBuf;
+	if (lstat (fullPath, &statBuf) < 0) {
+		NET_POP_EXCEPTION ("lstat %s failed, %s, %d", fullPath, __FILE__, __LINE__);
+	}
+	if (S_ISDIR (statBuf.st_mode) == 0) {
+		return false;
+	}
+
+	char* name = strrchr (fullPath, '/');
+	if (name == NULL) {
+		return false;
+	}
+	++name;
+	for (size_t i = 0; i < strlen(name); ++i) {
+		if (! isdigit (name[i])) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+void pidDirHandle (char* path)
+{
+	cout << "path:" << path << endl;
+	int length = strlen (path);
+	char* pr = path + length;
+	*pr++ = '/';
+	*pr = 0;
+
+	strcpy (pr, "fd");
+	struct stat statBuf;
+	if (lstat (path, &statBuf) < 0) {
+		NET_POP_EXCEPTION ("lstat %s failed, %s, %d", path, __FILE__, __LINE__);
+	}
+	if (S_ISDIR (statBuf.st_mode) == 0) {
+		NET_POP_EXCEPTION ("%s is not a directory, %s, %d", path, __FILE__, __LINE__);
+	}
+
+	DIR* dp = opendir (path);
+	if (dp == NULL) {
+		NET_POP_EXCEPTION ("can not open %s, %s, %d", path, __FILE__, __LINE__);
+	}
+
+	struct dirent* dirp;
+	vector<int> inodes;
+	while ((dirp = readdir (dp)) != NULL) {
+#ifdef DIRENT_HAVE_D_TYPE_WORKS
+		if (dirp->d_type!= DT_LNK) {
+			continue;
+		}
+#else
+		if (strcmp (dirp->d_name, ".") == 0 || strcmp (dirp->d_name, "..") == 0) {
+			continue;
+		}
+#endif
+		char buf[MAX_LENGTH], fdPath[MAX_LENGTH];
+		snprintf (fdPath, sizeof (fdPath), "%s/%s", path, dirp->d_name);
+		int lnameLen = readlink (fdPath, buf, sizeof (buf));
+		if (lnameLen < 0) {
+			continue;
+		}
+		buf[lnameLen] = 0;
+		
+		int inode;
+		if (strstr (buf, PRG_SOCKET_PFX) == NULL) {
+			continue;
+		}
+		sscanf (buf, "socket:[%d]", &inode);
+		inodes.push_back (inode);
+	}
+	
+	if (inodes.size () == 0) {
+		return;
+	}
+	pr = &path [length];
+	snprintf (pr, sizeof (path) - sizeof (char) * (length + 1), "/cmdline");
+	int fd = open (path, O_RDONLY);
+	if (fd < 0) {
+		return;
+	}
+	char buf[MAX_LENGTH], *name;
+	int len = read (fd, buf, sizeof (buf));
+	close (fd);
+	if (len < 0) {
+		return;
+	}
+	if (len < sizeof (buf) - 1) {
+		buf [len] = 0;
+	}
+	if ((name = strrchr (buf, '/')) != NULL) {
+		name++;
+	}
+	else {
+		name = buf;
+	}
+
+	path[length] = 0;
+	for (size_t i = 0; i < inodes.size (); ++i) {
+		cout << "##" << inodes[i] << name << endl;
+		addPrgNode (inodes[i], atoi (strrchr (path, '/') + 1), name);
+		cout << "$$" << inodes[i] << name << endl;
+	}
+}
+
+void addPrgNode (int inode, unsigned int pid,const string& name)
+{
+	struct node* p = prgNode[PRG_HASH_FUNC(inode)];
+	if (p != NULL) {	
+		while (p->_next != NULL) {
+			if (p->_inode == inode) {
+				//NET_POP_EXCEPTION ("inode:%d is already been added, %s, %d", 					//	inode, __FILE__, __LINE
+				// 

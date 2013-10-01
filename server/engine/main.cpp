@@ -2,24 +2,32 @@
 #include <cstdio>
 #include <cstdlib>
 #include <sstream>
+#include <iostream>
 
-#include "../process/process.h"
+#include "../progress/progress.h"
 #include "../capturer/filter/filter.h"
 #include "../capturer/capturer.h"
 #include "../util/utilFunc.h"
+#include "../util/sysDefine.h"
 
 int main (int argc, char* argv[])
 {
-	std::string processName = argv[1];
-	process proc (processName);
+	try {
+		std::string processName = argv[1];
+		process proc (processName);
 
-	char temp[30];
-	sprintf (temp, "port %d", proc.getPort ());
-	filter fr;
-	fr.setRule (temp);
+		char temp[30];
+		sprintf (temp, "port %d", proc.getPort ());
+		filter fr;
+		fr.setRule (temp);
 
-	capturer ct;
-	ct.capturePackage (&fr, packageHandle);
+		capturer ct;
+		ct.capturePackage (&fr, packageHandle);
+	}
+	catch (myException& e) {
+		std::cout << e.toString () << "\n";
+	}
+
 
 	return 0;
 }
