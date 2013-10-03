@@ -15,7 +15,7 @@ using namespace std;
 
 #define PROC_PATH			"/proc"
 #define MAX_LENGTH			256
-#define PRG_SOCKET_PFX		"socket:["
+#define PRG_SOCKET_PFX			"socket:["
 
 struct node* prgNode[PRG_HASH_SIZE];
 

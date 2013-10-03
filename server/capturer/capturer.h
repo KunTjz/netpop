@@ -1,6 +1,8 @@
 #ifndef __CAPTURE_H__
 #define __CAPTURE_H__
-#include "filter/filter.h" 
+
+#include "filter/filter.h"
+#include "../util/utilFunc.h" 
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -12,7 +14,7 @@ class capturer {
 public:
 	capturer () {}
 	capturer (std::string dev): _dev (dev) {}
-	void capturePackage (filter* fr, callBack func);
+	void capturePackage (filter* fr, callBack func, int delay);
 
 private:
 	std::string _dev; // Íø¿¨Éè±¸Ãû³Æ
