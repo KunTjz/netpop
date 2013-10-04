@@ -5,6 +5,7 @@
 #include <cctype>
 #include <vector>
 #include "../progress/progress.h"
+#include "package/package.h"
 
 enum {
 	ALARM_ON  = 1,
@@ -14,6 +15,8 @@ enum {
 static unsigned int alarmFlag = ALARM_OFF;
 extern struct sysConfig config;
 extern std::vector<class process*> procs;
+int linkType;
+std::string ip;
 
 void setAlarm (unsigned int time)
 {
@@ -47,17 +50,17 @@ inline void cancleAlarm ()
 void sigAlrm (int signo)
 {
 	system ("clear");
-	printf ("name\tpid\tport\tspeed\n");
+	printf ("name\t\tpid\t\tport\t\tspeed\n");
 	if (config._processName != NULL) {
 		class process* proc = getProcByName (config._processName);
-		printf ("%s\t%d\t%d\t%f KB/S\n", proc->getName ().c_str () ,
+		printf ("%s\t\t%d\t\t%d\t\t%f KB/S\n", proc->getName ().c_str () ,
 			proc->getPid (), 
 			proc->getPort (),
 			proc->getBytes () / ((float) 1024 * config._refreshDelay));
 	}
 	else if (config._processPid != -1) {
 		class process* proc = getProcByPid(config._processPid);
-		printf ("%s\t%d\t%d\t%f KB/S\n", proc->getName ().c_str () ,
+		printf ("%s\t\t%d\t\t%d\t\t%f KB/S\n", proc->getName ().c_str () ,
 			proc->getPid (), 
 			proc->getPort (),
 			proc->getBytes () / ((float) 1024 * config._refreshDelay));
@@ -77,14 +80,33 @@ void sigAlrm (int signo)
 }
 
 /* handle the package */
-void packageHandle(u_char *useless,
+void packageHandle(u_char *u_handle,
 				  const struct pcap_pkthdr* pkthdr,
 				  const u_char*packet)
 {
+	unsigned int DLT_Length = 0;
+	switch (linkType) {
+		case (DLT_EN10MB):
+			DLT_Length = 14;
+			break;
+		case (DLT_PPP):
+			DLT_Length = 16;
+			break;
+		default:
+			// TODO: maybe error? or other length?
+			return;
+	}
+
 	if (config._processName == NULL && config._processPid == -1) {
-		// TODO: analyse package to get port;
+		class process* proc = findProc (packet, DLT_Length, ip);
+		if (proc == NULL) {
+			return;		
+		}
+		proc->bytesAdd (pkthdr->len);
 	}
 	else {
+		//class process* proc = findProc (packet, DLT_Length, ip);
+		
 		if (config._processName != NULL) {
 			class process* proc = getProcByName (config._processName);
 			proc->bytesAdd (pkthdr->len);

@@ -12,8 +12,7 @@ typedef void (*callBack)(u_char *useless,const struct pcap_pkthdr* pkthdr,const 
 
 class capturer {
 public:
-	capturer () {}
-	capturer (std::string dev): _dev (dev) {}
+	capturer (const char* dev);
 	void capturePackage (filter* fr, callBack func, int delay);
 
 private:

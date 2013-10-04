@@ -14,6 +14,7 @@
 
 struct sysConfig config;
 extern std::vector<class process*> procs;
+extern std::string ip;
 
 static void help ()
 {
@@ -74,25 +75,31 @@ int main (int argc, char** argv)
 				proc=getProcByPid(config._processPid);			
 			}		
 			else if (config._processName != NULL) {
-				proc = getProcByName(config._processName);			
+				proc = getProcByName (config._processName);	
 			}	
 			if (proc == NULL) {
 				std::cerr << "get process failed\n";
 				exit (0);			
 			}			
 			
+			capturer ct ("eth0");
 			filter fr;
-			char temp[30];
-			sprintf (temp, "port %d", proc->getPort ());
-			fr.setRule (temp);
+			char temp[80];
+			sprintf (temp, "(src host %s and src port %d) or \
+			(dst host %s and dst port %d)", ip.c_str (),
+			proc->getPort (), ip.c_str (), proc->getPort ());
 
-			capturer ct;
+			fr.setRule (temp);
 			ct.capturePackage (&fr, packageHandle, config._refreshDelay);
 		}
 		else {	
-			buildProcessCache ();	
-			capturer ct;
-			ct.capturePackage (NULL, packageHandle, config._refreshDelay);
+			buildProcessCache ();
+
+			filter fr;
+			char temp[] = "udp and tcp";
+			fr.setRule (temp);
+			capturer ct ("eth0");
+			ct.capturePackage (&fr, packageHandle, config._refreshDelay);
 		}	
 	}
 	catch (myException& e) {
