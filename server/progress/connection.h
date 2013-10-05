@@ -14,6 +14,7 @@ struct connection{
 };
 
 void getTcpCt (struct connection** head);
+void getUdpCt (struct connection** head);
 // void readUdpCt ();
 
 

@@ -15,6 +15,7 @@ void buildProcessCache ()
 {
 	buildCache ();
 	getTcpCt (&head);
+	getUdpCt (&head);
 	
 	for (struct connection* p = head; p != NULL; p = p->_next) {
 		for (struct node * q = prgNode[PRG_HASH_FUNC(p->_inode)]; 

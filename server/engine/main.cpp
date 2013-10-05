@@ -96,14 +96,14 @@ int main (int argc, char** argv)
 			buildProcessCache ();
 
 			filter fr;
-			char temp[] = "udp and tcp";
+			char temp[] = "udp or tcp";
 			fr.setRule (temp);
 			capturer ct ("eth0");
 			ct.capturePackage (&fr, packageHandle, config._refreshDelay);
 		}	
 	}
 	catch (myException& e) {
-		std::cout << "Exception: "<< e.toString () << "\n";
+		std::cout << "Exception: "<< e.what () << "\n";
 	}
 
 

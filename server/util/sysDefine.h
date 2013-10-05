@@ -3,20 +3,20 @@
 
 #include <cstdio>
 #include <string>
-
+#include <stdexcept>
 #define ERROR_SIZE 100
 
-class myException
+class myException:public std::exception
 {
 public:
-	myException (char* errmsg): _errmsg (errmsg) {}
-	myException (std::string errmsg): _errmsg (errmsg) {}
-	std::string& toString () {
-		return _errmsg;	
+	explicit myException (char* errmsg) throw ():  _errmsg (errmsg) {}
+	explicit myException (std::string errmsg) throw (): _errmsg (errmsg) {}
+	~ myException () throw () {} // must add throw ()
+	const char* what () {
+		return _errmsg.c_str ();	
 	} 
 private:
 	std::string _errmsg;
-
 };
 
 #define NET_POP_EXCEPTION(str, args...)	do {	\

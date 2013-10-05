@@ -111,7 +111,7 @@ void capturer::capturePackage (filter* fr, callBack func, int delay)
 		pcap_loop(descr,-1, func, NULL);
 	}
 	catch (exception& e) {
-		cout << e.what ();
+		cout << e.what () << endl;
+		exit (0);
 	}
-
 }

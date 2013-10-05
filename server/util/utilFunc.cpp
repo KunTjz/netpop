@@ -50,27 +50,30 @@ inline void cancleAlarm ()
 void sigAlrm (int signo)
 {
 	system ("clear");
-	printf ("name\t\tpid\t\tport\t\tspeed\n");
+	printf ("pid\tport\tspeed\t\t\tname\n");
 	if (config._processName != NULL) {
 		class process* proc = getProcByName (config._processName);
-		printf ("%s\t\t%d\t\t%d\t\t%f KB/S\n", proc->getName ().c_str () ,
+		printf ("%d\t%d\t%.3f KB/S\t\t%s\n" ,
 			proc->getPid (), 
 			proc->getPort (),
-			proc->getBytes () / ((float) 1024 * config._refreshDelay));
+			proc->getBytes () / ((float) 1024 * config._refreshDelay),
+			proc->getName ().c_str ());
 	}
 	else if (config._processPid != -1) {
 		class process* proc = getProcByPid(config._processPid);
-		printf ("%s\t\t%d\t\t%d\t\t%f KB/S\n", proc->getName ().c_str () ,
+		printf ("%d\t%d\t%.3f KB/S\t\t%s\n", 
 			proc->getPid (), 
 			proc->getPort (),
-			proc->getBytes () / ((float) 1024 * config._refreshDelay));
+			proc->getBytes () / ((float) 1024 * config._refreshDelay),
+			proc->getName ().c_str ());
 	}
 	else {
 		for (size_t i = 0; i < procs.size (); ++i) {
-			printf ("%s\t%d\t%d\t%f KB/S\n", procs[i]->getName ().c_str () ,
+			printf ("%d\t%d\t%.3f KB/S\t\t%s\n", 
 				procs[i]->getPid (), 
 				procs[i]->getPort (),
-				procs[i]->getBytes () / ((float) 1024 * config._refreshDelay));
+				procs[i]->getBytes () / ((float) 1024 * config._refreshDelay),
+				procs[i]->getName ().c_str ());
 		}
 	}
 

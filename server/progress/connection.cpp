@@ -9,9 +9,9 @@
 #include <cstdio>
 using namespace std;
 
-void getTcpCt (struct connection** head)
+static void getConnect (struct connection** head, const char* path)
 {
-	ifstream in (TCP_CONNECTION_FILE);
+	ifstream in (path);
 	string line;
 
 	struct connection* ct = *head;
@@ -49,5 +49,15 @@ void getTcpCt (struct connection** head)
 			}
 			ct->_next = temp;
 		}
-	}
+	}	
+}
+
+void getTcpCt (struct connection** head)
+{
+	getConnect (head, TCP_CONNECTION_FILE);
+}
+
+void getUdpCt (struct connection** head)
+{
+	getConnect (head, UDP_CONNECTION_FILE);
 }
