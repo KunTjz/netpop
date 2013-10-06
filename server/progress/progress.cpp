@@ -30,6 +30,17 @@ void buildProcessCache ()
 	}
 }
 
+void delProcCache ()
+{
+	for (size_t i = 0; i < procs.size (); ++i) {
+		if (procs[i] != NULL) {
+			delete procs[i];
+			procs[i] = NULL;
+		}
+	}
+	clearCache ();
+}
+
 class process* getProcByName (const std::string& name)
 {
 	for (size_t i = 0; i < procs.size (); ++i) {

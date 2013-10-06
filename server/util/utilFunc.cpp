@@ -82,6 +82,13 @@ void sigAlrm (int signo)
 	setAlarm (config._refreshDelay);
 }
 
+void sigInt (int signo)
+{
+	// todo : clear cache.
+	delProcCache ();
+	exit (0);
+}
+
 /* handle the package */
 void packageHandle(u_char *u_handle,
 				  const struct pcap_pkthdr* pkthdr,

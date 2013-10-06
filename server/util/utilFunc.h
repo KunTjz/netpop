@@ -10,6 +10,7 @@ void packageHandle(u_char *useless,
 		  const u_char* packet);
 
 void sigAlrm (int signo);
+void sigInt (int signo);
 void setAlarm (unsigned int time); 
 int Atoi (char* str);
 

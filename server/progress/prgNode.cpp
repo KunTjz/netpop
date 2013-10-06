@@ -213,8 +213,11 @@ void clearCache ()
 	for (size_t i = 0; i < PRG_HASH_SIZE; ++i) {
 		struct node* p = prgNode[i];
 		if (p != NULL) {
-			struct node* temp = p->_next;
-			delete (temp);
+			while (p != NULL) {
+				struct node* temp = p;
+				p = p->_next;
+				delete (temp);
+			}
 		}
 	}
 }

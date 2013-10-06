@@ -49,6 +49,8 @@ public:
 };
 
 void buildProcessCache ();
+void delProcCache ();
+
 class process* getProcByName (const std::string& name);
 class process* getProcByPid (int pid);
 class process* getProcByPort (unsigned int port);

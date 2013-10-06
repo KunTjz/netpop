@@ -67,6 +67,10 @@ int main (int argc, char** argv)
 			std::cout << "set signal alarm error" << "\n";	
 			exit (1);	
 		}
+		if (signal (SIGINT, sigInt) == SIG_ERR) {
+			std::cout << "set signal int error" << "\n";
+			exit (1);
+		}
 
 		if (config._processPid != -1 || config._processName != NULL) {
 			buildProcessCache ();			
