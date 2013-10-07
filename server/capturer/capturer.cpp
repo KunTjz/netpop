@@ -5,6 +5,9 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <cstdio>
+
+using namespace std;
 
 extern int linkType;
 extern std::string ip;
@@ -62,13 +65,8 @@ capturer::capturer (const char* dev): _dev (dev)
 
 void capturer::capturePackage (filter* fr, callBack func, int delay)
 {
-	using namespace std;
-
 	char errbuf [PCAP_ERRBUF_SIZE];
 	pcap_t* descr;
-	const u_char *packet;
-	struct pcap_pkthdr hdr;     /* pcap.h                    */
-	struct ether_header *eptr;  /* net/ethernet.h            */
 	struct bpf_program fp;      /* hold compiled program     */
 
 	try {
@@ -93,7 +91,7 @@ void capturer::capturePackage (filter* fr, callBack func, int delay)
 		}
 
 		if (fr != NULL) {
-			char* temp = new char (fr->getRule ().size () + 1);
+			char* temp = new char [fr->getRule ().size () + 1];
 			strcpy (temp, fr->getRule ().c_str ());
 			if(pcap_compile (descr, &fp, temp, 0, 0) == -1) { 
 				cout << "Error calling pcap_compile\n"; 
@@ -105,8 +103,9 @@ void capturer::capturePackage (filter* fr, callBack func, int delay)
 				cout << "Error setting filter\n"; 
 				exit(1); 
 			}
+			delete temp;
 		}
-	
+
 		setAlarm (delay);
 		pcap_loop(descr,-1, func, NULL);
 	}

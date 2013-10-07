@@ -44,7 +44,7 @@ void delProcCache ()
 class process* getProcByName (const std::string& name)
 {
 	for (size_t i = 0; i < procs.size (); ++i) {
-		if (procs[i]->getName () == name)
+		if (procs[i] != NULL && procs[i]->getName () == name)
 			return procs[i];
 	}
 	return NULL;
@@ -53,7 +53,7 @@ class process* getProcByName (const std::string& name)
 class process* getProcByPid (int pid)
 {
 	for (size_t i = 0; i < procs.size (); ++i) {
-		if (procs[i]->getPid () == pid)
+		if (procs[i] != NULL && procs[i]->getPid () == pid)
 			return procs[i];
 	}
 	return NULL;
@@ -62,7 +62,7 @@ class process* getProcByPid (int pid)
 class process* getProcByPort (unsigned int port)
 {
 	for (size_t i = 0; i < procs.size (); ++i) {
-		if (procs[i]->getPort () == port)
+		if (procs[i] != NULL && procs[i]->getPort () == port)
 			return procs[i];
 	}
 	return NULL;

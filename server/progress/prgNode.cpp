@@ -203,7 +203,12 @@ void buildCache ()
 	/*for (size_t i = 0; i < PRG_HASH_SIZE; ++i) {
 		struct node* p = prgNode[i];
 		if (p != NULL) {
-			printf ("%d %d %s\n", p->_inode, p->_pid, p->_name.c_str ());
+		}
+		if (i == 67) {
+			while (p != NULL) {
+				printf ("%d\n", p->_inode);
+				p = p->_next;
+			}
 		}
 	}*/
 }
@@ -212,12 +217,10 @@ void clearCache ()
 {
 	for (size_t i = 0; i < PRG_HASH_SIZE; ++i) {
 		struct node* p = prgNode[i];
-		if (p != NULL) {
-			while (p != NULL) {
-				struct node* temp = p;
-				p = p->_next;
-				delete (temp);
-			}
+		while (p != NULL) {
+			struct node* temp = p;
+			p = p->_next;
+			delete temp;
 		}
 	}
 }

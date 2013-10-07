@@ -88,7 +88,7 @@ int main (int argc, char** argv)
 			
 			capturer ct ("eth0");
 			filter fr;
-			char temp[80];
+			char temp[180];
 			sprintf (temp, "(src host %s and src port %d) or \
 			(dst host %s and dst port %d)", ip.c_str (),
 			proc->getPort (), ip.c_str (), proc->getPort ());
