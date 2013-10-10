@@ -8,6 +8,7 @@
 
 using namespace std;
 extern struct node* prgNode[PRG_HASH_SIZE];
+extern string ip;
 struct connection* head = NULL;
 vector<class process*> procs;
 
@@ -23,6 +24,8 @@ void buildProcessCache ()
 			if (p->_inode == q->_inode) {
 				class process* proc = new process (q->_name
 								  , p->_port
+								  , p->_remIp
+								  , p->_remPort
 								  , q->_pid); 
 				procs.push_back (proc);
 			}			
@@ -66,4 +69,26 @@ class process* getProcByPort (unsigned int port)
 			return procs[i];
 	}
 	return NULL;
+}
+
+class process* getProcByConInfo (const std::string& sourceIp, 
+				 const std::string& dstIp,
+				 unsigned int sourcePort,
+				 unsigned int dstPort)
+{
+	for (size_t i = 0; i < procs.size (); ++i) {
+		if (procs[i] == NULL)
+			continue;
+		if (procs[i]->getPort () == sourcePort && 
+		    procs[i]->getRemPort () == dstPort &&
+		    procs[i]->getRemIp () == dstIp)
+			return procs[i];
+		else if (procs[i]->getPort () == dstPort && 
+		    	 procs[i]->getRemPort () == sourcePort &&
+		     	 procs[i]->getRemIp () == sourceIp &&
+			 dstIp == ip)
+			return procs[i];
+	}
+	return NULL;
+
 }

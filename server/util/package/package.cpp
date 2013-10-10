@@ -30,22 +30,28 @@ class process* findProc (const u_char* packet, unsigned int DLT_Length,
 
 	if (ip->proto == 0x06 ) {
 		tcpHeader* tcp = (tcpHeader*)((u_char*)ip + (ip->ver_len & 0xf) * 4);
-		if (sourceIp == ipAddr) {
+		return getProcByConInfo (sourceIp, destinationIp, 
+					 ntohs (tcp->sourcePort),
+					 ntohs (tcp->destinationPort));
+		/*if (sourceIp == ipAddr) {
 			return getProcByPort (ntohs (tcp->sourcePort)); 		
 		}
 		else if (destinationIp == ipAddr) {
 			return getProcByPort (ntohs (tcp->destinationPort)); 		
-		}
+		}*/
 		
 	}
 	else if (ip->proto == 0x17) {
 		udpHeader* udp = (udpHeader*)((u_char*)ip + (ip->ver_len & 0xf) * 4);
-		if (sourceIp == ipAddr) {
+		return getProcByConInfo (sourceIp, destinationIp, 
+					 ntohs (udp->sourcePort),
+					 ntohs (udp->destinationPort));
+		/*if (sourceIp == ipAddr) {
 			return getProcByPort (ntohs (udp->sourcePort)); 		
 		}
 		else if (destinationIp == ipAddr) {
 			return getProcByPort (ntohs (udp->destinationPort)); 		
-		}	
+		}*/	
 	}
 
 	return NULL;

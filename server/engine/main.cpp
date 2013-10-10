@@ -21,8 +21,8 @@ static void help ()
 	std::cerr << "useage: netpop [-V] [-d seconds] [-n processname] [-p pid] [-k speedlimit(kb/s)]\n";
 	std::cerr << "        -V : print version info\n";
 	std::cerr << "        -d : delay for update refresh rate in seconds, default is 1\n";
-	std::cerr << "        -n : monitor specific process by it's name\n";
-	std::cerr << "        -p : monitor specific process by it's pid\n";
+	std::cerr << "        -n : monitor specific process by it's full name (not recommend)\n";
+	std::cerr << "        -p : monitor specific process by it's pid(recommend)\n";
 	std::cerr << "        -k : set the limit of bandwith (kb/s). the process will be\n"; 		std::cerr << "             killed when it's speed is bigger than the limit\n";
 }
 

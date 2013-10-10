@@ -10,8 +10,10 @@ enum {
 
 class process{
 private:
-	std::string		_name; // 进程名
-	unsigned int		_port; // 进程使用的端口号
+	std::string		_name; // processName
+	unsigned int		_port; // localPort
+	std::string		_remIp;	// connected process's remote ip 
+	unsigned int 		_remPort; // connected process's remote port
 	int 			_pid;  // process pid numbe
 	unsigned int 		_bytes;  
 
@@ -20,9 +22,11 @@ private:
 	//void getPort (struct connection* head, unsigned int pattern);
 
 public:
-	process (const std::string& name, unsigned int port, int pid): 
+	process (const std::string& name, unsigned int port, const std::string& ip, unsigned int remPort, int pid): 
 		_name (name),
 		_port (port),
+		_remIp (ip),
+		_remPort (remPort),
 		_pid (pid),
 		_bytes (0) {
 			
@@ -36,6 +40,12 @@ public:
 	}
 	int getPid () {
 		return _pid;
+	}
+	std::string getRemIp () {
+		return _remIp;
+	}
+	unsigned int getRemPort () {
+		return _remPort;
 	}
 	unsigned int getBytes () {
 		return _bytes;	
@@ -54,5 +64,8 @@ void delProcCache ();
 class process* getProcByName (const std::string& name);
 class process* getProcByPid (int pid);
 class process* getProcByPort (unsigned int port);
-
+class process* getProcByConInfo (const std::string& sourceIp, 
+				 const std::string& dstIp,
+				 unsigned int sourcePort,
+				 unsigned int dstPort);
 #endif

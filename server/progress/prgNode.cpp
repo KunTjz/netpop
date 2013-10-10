@@ -109,12 +109,12 @@ void pidDirHandle (char* path)
 	if (len < sizeof (buf) - 1) {
 		buf [len] = 0;
 	}
-	if ((name = strrchr (buf, '/')) != NULL) {
-		name++;
-	}
-	else {
-		name = buf;
-	}
+	//if ((name = strrchr (buf, '/')) != NULL) {
+	//	name++;
+	//}
+	//else {
+	name = buf;
+	//}
 
 	path[length] = 0;
 	for (size_t i = 0; i < inodes.size (); ++i) {

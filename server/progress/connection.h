@@ -10,6 +10,8 @@ struct connection{
 	int 		_inode;
 	std::string 	_ip;
 	unsigned int    _port;	
+	std::string	_remIp;
+	unsigned int 	_remPort;
 	struct connection* _next;
 };
 
