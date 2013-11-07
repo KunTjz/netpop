@@ -6,7 +6,8 @@ export ROOTDIRS = $(shell pwd)
 TARGET_DIRS = 	capturer	\
 				engine	\
 				progress	\
-				util
+				util	\
+				dataHandler
 
 EXE = netpop
 

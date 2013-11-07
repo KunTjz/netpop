@@ -60,7 +60,8 @@ std::string getDevIp (const char* dev)
 
 capturer::capturer (const char* dev): _dev (dev) 
 {
-	ip = getDevIp (_dev.c_str ());
+	// 在main.cpp中改用getifaddrs方法获得
+	//ip = getDevIp (_dev.c_str ());
 }
 
 void capturer::capturePackage (filter* fr, callBack func, int delay)

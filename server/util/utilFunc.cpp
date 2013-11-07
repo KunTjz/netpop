@@ -5,8 +5,13 @@
 #include <signal.h>
 #include <cctype>
 #include <vector>
+#include <cstring>
+#include <ifaddrs.h>  
+#include <arpa/inet.h>  
+      
 #include "../progress/progress.h"
 #include "package/package.h"
+#include "../dataHandler/dataHandler.h"
 
 enum {
 	ALARM_ON  = 1,
@@ -57,7 +62,7 @@ void killProcess (float speed, class process* proc)
 		char cmd[50];
 		snprintf (cmd, sizeof (cmd), "kill -9 %d", proc->getPid());
 		system (cmd);
-		printf ("the speed is over the limit:%.3f\n", config._speedLimit);
+		printf ("the speed is over the limit:%d\n", config._speedLimit);
 		printf (" process:%s has been killed", proc->getName().c_str());
 		sigInt (SIGINT);
 	}
@@ -67,25 +72,24 @@ void sigAlrm (int signo)
 {
 	system ("clear");
 	printf ("pid\tport\tspeed\t\t\tname\n");
-	if (config._processName != NULL) {
-		class process* proc = getProcByName (config._processName);
+	if (config._processName != NULL
+	   || config._processPid != -1) {
+		class process* proc;
+		if (config._processName != NULL)
+			proc = getProcByName (config._processName);
+		else 
+			proc = getProcByPid (config._processPid);
+
 		float speed = proc->getBytes () / ((float) 1024 * config._refreshDelay);
 		printf ("%d\t%d\t%.3f KB/S\t\t%s\n" ,
 			proc->getPid (), 
 			proc->getPort (),
 			speed,
 			proc->getName ().c_str ());
-		if (config._speedLimit != -1)
-			killProcess (speed, proc);
-	}
-	else if (config._processPid != -1) {
-		class process* proc = getProcByPid(config._processPid);
-		float speed = proc->getBytes () / ((float) 1024 * config._refreshDelay);
-		printf ("%d\t%d\t%.3f KB/S\t\t%s\n", 
-			proc->getPid (), 
-			proc->getPort (),
-			proc->getBytes () / ((float) 1024 * config._refreshDelay),
-			proc->getName ().c_str ());
+		
+		static dataHandler dh (proc->getName (), config._refreshDelay);
+		dh.addData (speed);
+
 		if (config._speedLimit != -1)
 			killProcess (speed, proc);
 	}
@@ -165,3 +169,31 @@ int Atoi (char* str)
 
 	return atoi (str);
 }
+
+int getNetInfo(char* devName, char* ipAddress)
+{
+        struct sockaddr_in *sin = NULL;
+        struct ifaddrs *ifa = NULL, *ifList;
+
+        if (getifaddrs(&ifList) < 0) return -1;
+
+        for (ifa = ifList; ifa != NULL; ifa = ifa->ifa_next)
+        {
+            if(ifa->ifa_addr->sa_family == AF_INET 
+               && strcmp (ifa->ifa_name, "lo"))
+            {
+	        strcpy (devName, ifa->ifa_name);
+
+                sin = (struct sockaddr_in *)ifa->ifa_addr;
+                strcpy (ipAddress, inet_ntoa (sin->sin_addr));
+		
+		freeifaddrs (ifList);
+		return 0;
+            }
+        }
+        
+        freeifaddrs(ifList);
+        
+        return -1;
+}
+

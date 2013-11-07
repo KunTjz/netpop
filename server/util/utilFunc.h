@@ -13,6 +13,7 @@ void sigAlrm (int signo);
 void sigInt (int signo);
 void setAlarm (unsigned int time); 
 int Atoi (char* str);
+int getNetInfo (char* devName, char* ipAddress);
 
 struct sysConfig {
 	unsigned int _refreshDelay;
@@ -21,7 +22,7 @@ struct sysConfig {
 	int _speedLimit;
 	
 	sysConfig ():
-		_refreshDelay (1),
+		_refreshDelay (2),
 		_processName (NULL),
 		_processPid (-1),
 		_speedLimit (-1) {}

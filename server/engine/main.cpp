@@ -20,7 +20,7 @@ static void help ()
 {
 	std::cerr << "useage: netpop [-V] [-d seconds] [-n processname] [-p pid] [-k speedlimit(kb/s)]\n";
 	std::cerr << "        -V : print version info\n";
-	std::cerr << "        -d : delay for update refresh rate in seconds, default is 1\n";
+	std::cerr << "        -d : delay for update refresh rate in seconds, default is 2\n";
 	std::cerr << "        -n : monitor specific process by it's full name (not recommend)\n";
 	std::cerr << "        -p : monitor specific process by it's pid(recommend)\n";
 	std::cerr << "        -k : set the limit of bandwith (kb/s). the process will be\n"; 		std::cerr << "             killed when it's speed is bigger than the limit\n";
@@ -33,7 +33,7 @@ static void getConfig (char** argv)
 			switch (*(++*argv)) {
 				case 'V':
 					std::cout << "version 1.1.1 , programed by richard , in 2013.10\n";
-					break;
+					exit (0);
 				case 'd':
 					config._refreshDelay = Atoi (*(++argv));
 					break;
@@ -58,11 +58,22 @@ static void getConfig (char** argv)
 	}		
 }
 
+static std::string getNetDevInfo ()
+{
+	 char name[20], ipAddress[20];
+         if (getNetInfo (name, ipAddress) == -1) {
+         	std::cerr << "get interface info failed\n";
+		exit (-1);
+         }
+	 
+	 ip = ipAddress;
+	 return std::string(name);
+}
+
 int main (int argc, char** argv)
 {
 	try {
 		getConfig (argv);
-		
 		if (signal (SIGALRM, sigAlrm) == SIG_ERR) {
 			std::cout << "set signal alarm error" << "\n";	
 			exit (1);	
@@ -86,7 +97,8 @@ int main (int argc, char** argv)
 				exit (0);			
 			}			
 			
-			capturer ct ("eth0");
+			std::string devName = getNetDevInfo ();
+			capturer ct (devName.c_str ());
 			filter fr;
 			char temp[180];
 			sprintf (temp, "(src host %s and src port %d) or \
@@ -102,7 +114,10 @@ int main (int argc, char** argv)
 			filter fr;
 			char temp[] = "udp or tcp";
 			fr.setRule (temp);
-			capturer ct ("eth0");
+			
+			std::string devName = getNetDevInfo ();
+			std::cout << "---" << devName;
+			capturer ct (devName.c_str ());
 			ct.capturePackage (&fr, packageHandle, config._refreshDelay);
 		}	
 	}
